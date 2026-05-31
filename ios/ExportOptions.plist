@@ -2,13 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- เปลี่ยน method เป็น app-store เมื่อพร้อมอัปโหลด App Store -->
+    <!-- 
+      สำหรับ build แบบพัฒนา/ทดสอบ ใช้ "development" หรือ "ad-hoc"
+      ถ้าต้องการอัปโหลด App Store / TestFlight ด้วยตนเอง ค่อยเปลี่ยนเป็น "app-store"
+    -->
     <key>method</key>
-    <string>app-store</string>
-
-    <!-- สำหรับการทดสอบครั้งแรก แนะนำใช้ "development" หรือ "ad-hoc" -->
-    <!-- <key>method</key> -->
-    <!-- <string>development</string> -->
+    <string>development</string>
 
     <key>signingStyle</key>
     <string>automatic</string>
@@ -16,9 +15,11 @@
     <key>stripSwiftSymbols</key>
     <true/>
 
+    <!-- 
+      ถ้าใช้ Automatic code signing ใน Codemagic 
+      สามารถเว้นว่าง teamID ได้
+    -->
     <key>teamID</key>
-    <!-- ใส่ Team ID ของคุณที่นี่ (เช่น 9A12345678) -->
-    <!-- หรือปล่อยว่างถ้าใช้ Automatic code signing บน Codemagic -->
     <string></string>
 </dict>
 </plist>

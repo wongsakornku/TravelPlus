@@ -1,35 +1,38 @@
-# codemagic.yaml - สำหรับ build iOS IPA
-# วางไฟล์นี้ที่ root ของโปรเจกต์ แล้ว push ขึ้น Git
+# ================================================
+# Codemagic YAML - TravelPlus (Flutter + Hive)
+# สำหรับ build iOS IPA (ไม่ auto publish)
+# ================================================
 
 workflows:
-  ios-release:
-    name: iOS Release (Hive + Build Runner)
+  ios-build:
+    name: iOS IPA Build
     max_build_duration: 60
-    instance_type: mac_mini_m2  # หรือ mac_mini_m1
+    instance_type: mac_mini_m2
 
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
 
-      # ถ้าต้องการใช้ environment variables (เช่น App Store Connect)
-      # groups:
-      #   - app-store-credentials
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/.dart-tool
 
     scripts:
-      - name: Install Flutter dependencies
+      - name: Install dependencies
         script: |
           flutter pub get
 
-      - name: Generate code with build_runner (สำคัญมากสำหรับ Hive)
+      - name: Generate code with build_runner (สำคัญสำหรับ Hive)
         script: |
           dart run build_runner build --delete-conflicting-outputs
 
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods
         script: |
           cd ios && pod install
 
-      - name: Build iOS IPA (Release)
+      - name: Build iOS IPA
         script: |
           flutter build ipa --release \
             --export-options-plist=ios/ExportOptions.plist
@@ -45,15 +48,9 @@ workflows:
           success: true
           failure: true
 
-      # ตัวอย่าง: ส่งไปที่ Slack
-      # slack:
-      #   channel: '#flutter-builds'
-      #   notify_on_build_start: false
-
-# =====================================================
-# หมายเหตุสำคัญ:
-# 1. ต้องมีโฟลเดอร์ ios/ ใน repository ก่อน (สำคัญมาก)
-# 2. ต้องตั้งค่า Code Signing ใน Codemagic (Certificates, Provisioning Profiles)
-# 3. สำหรับการ build แรก แนะนำให้ใช้ "development" หรือ "adhoc" ก่อน
-# 4. ถ้าต้องการ publish ไป App Store ต้องตั้งค่า App Store Connect API Key
-# =====================================================
+# ================================================
+# หมายเหตุ:
+# - ต้องมีโฟลเดอร์ ios/ ใน repository ก่อน
+# - ต้องตั้งค่า Code Signing ใน Codemagic
+# - ไฟล์ .ipa จะถูก export เป็น artifact ให้ดาวน์โหลด
+# ================================================
