@@ -1,0 +1,59 @@
+# codemagic.yaml - สำหรับ build iOS IPA
+# วางไฟล์นี้ที่ root ของโปรเจกต์ แล้ว push ขึ้น Git
+
+workflows:
+  ios-release:
+    name: iOS Release (Hive + Build Runner)
+    max_build_duration: 60
+    instance_type: mac_mini_m2  # หรือ mac_mini_m1
+
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+      # ถ้าต้องการใช้ environment variables (เช่น App Store Connect)
+      # groups:
+      #   - app-store-credentials
+
+    scripts:
+      - name: Install Flutter dependencies
+        script: |
+          flutter pub get
+
+      - name: Generate code with build_runner (สำคัญมากสำหรับ Hive)
+        script: |
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios && pod install
+
+      - name: Build iOS IPA (Release)
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=ios/ExportOptions.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: true
+
+      # ตัวอย่าง: ส่งไปที่ Slack
+      # slack:
+      #   channel: '#flutter-builds'
+      #   notify_on_build_start: false
+
+# =====================================================
+# หมายเหตุสำคัญ:
+# 1. ต้องมีโฟลเดอร์ ios/ ใน repository ก่อน (สำคัญมาก)
+# 2. ต้องตั้งค่า Code Signing ใน Codemagic (Certificates, Provisioning Profiles)
+# 3. สำหรับการ build แรก แนะนำให้ใช้ "development" หรือ "adhoc" ก่อน
+# 4. ถ้าต้องการ publish ไป App Store ต้องตั้งค่า App Store Connect API Key
+# =====================================================
